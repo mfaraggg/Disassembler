@@ -2,8 +2,7 @@
 	This is just a skeleton. It DOES NOT implement all the requirements.
 	It only recognizes the RV32I "ADD", "SUB" and "ADDI" instructions only. 
 	It prints "Unkown Instruction" for all other instructions!
-
-	    OF
+	
 	Usage example:
 		$ rvcdiss t1.bin
 	should print out:
@@ -33,7 +32,7 @@ unsigned int pc = 0x0;
 
 char memory[8*1024];	// only 8KB of memory located at address 0
 
-void emitError(char *s)
+void emitError(string s)
 {
 	cout << s;
 	exit(0);
@@ -45,26 +44,25 @@ void printPrefix(unsigned int instA, unsigned int instW){
 
 void instDecExec(unsigned int instWord)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7, opcode;
+	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
 	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	//all this in a function --
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
-	rs2 = (instWord >> 20) & 0x0000001F; //wat
+	rs2 = (instWord >> 20) & 0x0000001F;
 
 	// — inst[31] — inst[30:25] inst[24:21] inst[20]
 	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-    //till here --
+
 	printPrefix(instPC, instWord);
 
 	if(opcode == 0x33){		// R Instructions
-		switch(funct3){ //call R inst function
+		switch(funct3){
 			case 0: if(funct7 == 32) {
 								cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
 							}
@@ -137,7 +135,7 @@ int main(int argc, char *argv[]){
 	ifstream inFile;
 	ofstream outFile;
 
-	if(argc<2) emitError("use: rvcdiss <machine_code_file_name>\n");
+	if(argc<2) emitError("use: rvcdiss <t1.bin>\n");
 
 	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
 
