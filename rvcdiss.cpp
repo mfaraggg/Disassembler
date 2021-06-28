@@ -1,4 +1,4 @@
-/*
+/*		//FARAG BRANCH TEST
 	This is just a skeleton. It DOES NOT implement all the requirements.
 	It only recognizes the RV32I "ADD", "SUB" and "ADDI" instructions only. 
 	It prints "Unkown Instruction" for all other instructions!
