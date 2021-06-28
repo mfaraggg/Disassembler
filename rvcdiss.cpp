@@ -149,7 +149,7 @@ void R_Type(unsigned int instWord)
 void I_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, imm, funct3, funct7 = 0, opcode;
-	//unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
+	unsigned int temp = 0;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
@@ -167,8 +167,9 @@ void I_Type(unsigned int instWord)
             case 0:    cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                     break;
             case 1:
-                cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
-                        break;
+			temp = imm & 0x0000001F; //check if this is necessary
+			cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp << "\n";
+			break;
             case 2:
                 cout << "\tSLTI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
@@ -178,10 +179,15 @@ void I_Type(unsigned int instWord)
             case 4:
                 cout << "\tXORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
-//     case 5:
-//                cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
-//                        break; ( check this case 3shan SRAI )
-            case 6:
+		case 5:
+			temp = (instWord >> 30) & 0x3;
+			if (temp == 0)
+				cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
+			else
+				cout << "\tSRAI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
+			break;
+			
+		case 6:
                 cout << "\tORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 7:
