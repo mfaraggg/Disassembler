@@ -25,7 +25,7 @@
 #include <fstream>
 #include "stdlib.h"
 #include <iomanip>
-
+#include <string>
 using namespace std;
 
 unsigned int pc = 0x0;
@@ -42,48 +42,23 @@ void printPrefix(unsigned int instA, unsigned int instW){
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
 
-void instDecExec(unsigned int instWord)
+
+int concat(int a, int b)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
-	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
-	unsigned int address;
-
-	unsigned int instPC = pc - 4;
-
-	opcode = instWord & 0x0000007F;
-	rd = (instWord >> 7) & 0x0000001F;
-	funct3 = (instWord >> 12) & 0x00000007;
-	rs1 = (instWord >> 15) & 0x0000001F;
-	rs2 = (instWord >> 20) & 0x0000001F;
-
-	// — inst[31] — inst[30:25] inst[24:21] inst[20]
-	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-
-	printPrefix(instPC, instWord);
-
-	if(opcode == 0x33){		// R Instructions
-		switch(funct3){
-			case 0: if(funct7 == 32) {
-								cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-							}
-							else {
-								cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
-							}
-							break;
-			default:
-							cout << "\tUnkown R Instruction \n";
-		}
-	} else if(opcode == 0x13){	// I instructions
-		switch(funct3){
-			case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
-					break;
-			default:
-					cout << "\tUnkown I Instruction \n";
-		}
-	} else {
-		cout << "\tUnkown Instruction \n";
-	}
-
+ 
+    // Convert both the integers to string
+    string s1 = to_string(a);
+    string s2 = to_string(b);
+ 
+    // Concatenate both strings
+    string s = s1 + s2;
+ 
+    // Convert the concatenated string
+    // to integer
+    int c = stoi(s);
+ 
+    // return the formed integer
+    return c;
 }
 
 void R_Type(unsigned int instWord)
@@ -224,6 +199,93 @@ void I_Type(unsigned int instWord)
     else {
         cout << "\tUnkown Instruction \n";
     }
+
+}
+
+
+void S_Type(unsigned int instWord)
+{
+	unsigned int rs1, rs2, funct3, imm1, imm2 = 0, opcode;
+	unsigned int address;
+
+	unsigned int instPC = pc - 4;
+
+	opcode = instWord & 0x0000007F;
+	imm1 = (instWord >> 7) & 0x0000001F;
+	funct3 = (instWord >> 12) & 0x00000007;
+	rs1 = (instWord >> 15) & 0x0000001F;
+	rs2 = (instWord >> 20) & 0x0000001F;
+	imm2 = (instWord >> 25) & 0x0000007F;
+
+	printPrefix(instPC, instWord);
+
+	switch (funct3) {
+	case 0: 
+	//Store Byte
+		cout << "\tSB\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << concat(imm2,imm1) <<  "\n";
+	//concatenate?
+		break;
+	case 1:
+		cout << "\tSH\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << concat(imm2,imm1) <<  "\n";
+		break;
+	case 2:
+		cout << "\tSW\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << concat(imm2,imm1) <<  "\n";
+		break;
+
+	
+
+	default:
+		cout << "\tUnknown S Instruction \n";
+	}
+}
+
+
+void instDecExec(unsigned int instWord)
+{
+	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
+	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
+	unsigned int address;
+
+	unsigned int instPC = pc - 4;
+
+	opcode = instWord & 0x0000007F;
+	rd = (instWord >> 7) & 0x0000001F;
+	funct3 = (instWord >> 12) & 0x00000007;
+	rs1 = (instWord >> 15) & 0x0000001F;
+	rs2 = (instWord >> 20) & 0x0000001F;
+
+	// — inst[31] — inst[30:25] inst[24:21] inst[20]
+	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+
+	// printPrefix(instPC, instWord);
+
+	if(opcode == 0x33){		// R Instructions
+		R_Type(instWord);
+		// switch(funct3){
+		// 	case 0: if(funct7 == 32) {
+		// 						cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		// 					}
+		// 					else {
+		// 						cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+		// 					}
+		// 					break;
+		// 	default:
+		// 					cout << "\tUnkown R Instruction \n";
+		// }
+	} else if(opcode == 0x13){	// I instructions
+		I_Type(instWord);
+		// switch(funct3){
+		// 	case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+		// 			break;
+		// 	default:
+		// 			cout << "\tUnkown I Instruction \n";
+		// }
+	}  else if(opcode == 0x23){
+		S_Type(instWord);
+	} else {
+		printPrefix(instPC, instWord);
+		cout << "\tUnkown Instruction \n";
+	}
 
 }
 
