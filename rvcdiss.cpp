@@ -192,7 +192,7 @@ void I_Type(unsigned int instWord)
 }
 
 int main(int argc, char *argv[]){
-
+//Testing 123
 	unsigned int instWord=0;
 	ifstream inFile;
 	ofstream outFile;
