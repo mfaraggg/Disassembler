@@ -134,28 +134,28 @@ void I_Type(unsigned int instWord)
 
 	if(opcode == 0x13){    // I instructions
         switch(funct3){
-            case 0:    cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+            case 0:    cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                     break;
             case 1:
-                cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 2:
-                cout << "\tSLTI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tSLTI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 3:
-                cout << "\tSLTIU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tSLTIU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 4:
-                cout << "\tXORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tXORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
 //     case 5:
 //                cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
 //                        break; ( check this case 3shan SRAI )
             case 6:
-                cout << "\tORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tORI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 7:
-                cout << "\tANDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tANDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             
             default:
@@ -165,19 +165,19 @@ void I_Type(unsigned int instWord)
 	else if(opcode ==0x3){    // I-load instructions
         switch(funct3){
             case 0:
-                cout << "\tLB\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tLB\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 1:
-                cout << "\tLH\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tLH\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 2:
-                cout << "\tLW\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tLW\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 4:
-                cout << "\tLBU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tLBU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             case 5:
-                cout << "\tLHU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
+                cout << "\tLHU\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
                         break;
             default:
                     cout << "\tUnkown I Instruction \n";
