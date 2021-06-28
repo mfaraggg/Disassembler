@@ -102,9 +102,18 @@ void R_Type(unsigned int instWord)
 
 	printPrefix(instPC, instWord);
 
-	switch (funct3) {
-
-	}
+	if(opcode == 0x33){        // R Instructions
+        switch(funct3){
+            case 0: if(funct7 == 32) {
+                                cout << "\tSUB\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                            }
+                            else {
+                                cout << "\tADD\tx" << rd << ", x" << rs1 << ", x" << rs2 << "\n";
+                            }
+                            break;
+            default:
+                            cout << "\tUnkown R Instruction \n";
+        }
 }
 
 void I_Type(unsigned int instWord)
