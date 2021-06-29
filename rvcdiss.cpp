@@ -305,25 +305,25 @@ void B_Type(unsigned int instWord)
 
 void J_Type(unsigned int instWord)
 {
-	unsigned int rd, imm, opcode;
+	unsigned int rd, imm, opcode, temp;
 	unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
+	//
 	imm = (instWord >> 12) & 0x000000FF;
-	temp = (instWord >> 20) & 0x000001:
+	temp = (instWord >> 20) & 0x000001;
 	imm = imm + temp;
 	imm = (instWord >> 21) & 0x00003FF;
 	temp = (instWord >> 30) & 0x00001;
 	imm = imm + temp;
 	
+	imm = imm << 1;
 	printPrefix(instPC, instWord);
 
-	if(opcode==0x6F){
-		cout << "\tJAL\tx" << rd << ", " << imm << "\n";
-	}
+	cout << "\tJAL\tx" << rd << ", " << "0x" << hex << imm << "\n";
 	
 	
 }
@@ -357,8 +357,11 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x63){ // B Instructions
 		B_Type(instWord);
 	}
-	else if (opcode == 0x17 || opcode == 0x37){ // B Instructions
+	else if (opcode == 0x17 || opcode == 0x37){ // U Instructions
 		U_Type(instWord);
+	}
+	else if (opcode == 0x6F){ // J Instructions
+		J_Type(instWord);
 	}
 	else {
 		printPrefix(instPC, instWord);
