@@ -308,7 +308,20 @@ void B_Type(unsigned int instWord)
 	}
 
 }
+void J_Type(unsigned int instWord)
+{
+	unsigned int rd, imm, opcode;
+	unsigned int address;
 
+	unsigned int instPC = pc - 4;
+
+	opcode = instWord & 0x0000007F;
+	rd = (instWord >> 7) & 0x0000001F;
+	imm = (instWord >> 12) & 0x000FFFFF;
+	
+	
+	
+}
 void instDecExec(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
@@ -342,7 +355,7 @@ void instDecExec(unsigned int instWord)
 		// 					cout << "\tUnknown R Instruction \n";
 		// }
 	}
-	else if (opcode == 0x13) {	// I instructions
+	else if (opcode == 0x13 || opcode==0x3) {	// I instructions
 		I_Type(instWord);
 		// switch(funct3){
 		// 	case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
