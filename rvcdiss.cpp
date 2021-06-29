@@ -193,8 +193,11 @@ void I_Type(unsigned int instWord)
 			cout << "\tUnknown I Instruction \n";
 
 		}
+	}else if (opcode == 0x67) { 
+		
+		cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
+		
 	}
-
 	else {
 		cout << "\tUnknown Instruction \n";
 	}
@@ -324,10 +327,12 @@ void J_Type(unsigned int instWord)
 	imm = (instWord >> 21) & 0x00003FF;
 	temp = (instWord >> 30) & 0x00001;
 	imm = imm + temp;
-
-	imm = imm << 1;
-
 	
+	printPrefix(instPC, instWord);
+
+	if(opcode==0x6F){
+		cout << "\tJAL\tx" << rd << ", " << imm << "\n";
+	}
 	
 	
 }
@@ -364,7 +369,7 @@ void instDecExec(unsigned int instWord)
 		// 					cout << "\tUnknown R Instruction \n";
 		// }
 	}
-	else if (opcode == 0x13 || opcode==0x3) {	// I instructions
+	else if (opcode == 0x13 || opcode==0x3 || opcode == 0x67) {	// I instructions
 		I_Type(instWord);
 		// switch(funct3){
 		// 	case 0:	cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)I_imm << "\n";
