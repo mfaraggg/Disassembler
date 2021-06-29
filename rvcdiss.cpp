@@ -367,6 +367,12 @@ void instDecExec(unsigned int instWord)
 	else if (opcode == 0x23) {
 		S_Type(instWord);
 	}
+	else if (opcode == 0x63) {
+		B_Type(instWord);
+	}
+	else if (opcode == 0x37 || opcode == 0x17) {
+		U_Type(instWord);
+	}
 	else {
 		printPrefix(instPC, instWord);
 		cout << "\tUnknown Instruction \n";
