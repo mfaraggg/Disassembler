@@ -317,7 +317,7 @@ void J_Type(unsigned int instWord)
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
-	imm = (instWord >> 12) & 0x000FFFFF;
+	
 	
 	
 	
