@@ -237,9 +237,9 @@ void U_Type(unsigned int instWord)
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x37) 
-		cout << "\tLUI\tx" << rd << ", " << imm << "\n";
+		cout << "\tLUI\tx" << rd << ", " << hex << "0x" << imm << "\n";
 	else if (opcode == 0x17)
-		cout << "\tAUIPC\tx" << rd << ", " << imm << "\n";
+		cout << "\tAUIPC\tx" << rd << ", " << hex << "0x" << imm << "\n";
 	else
 		cout << "\tUnknown U Instruction \n";
 
