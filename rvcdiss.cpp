@@ -86,12 +86,7 @@ void I_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, funct3, opcode;
 	unsigned int imm;
-<<<<<<< HEAD
 	unsigned int temp = 0, temp2 = 0;
-=======
-	unsigned int temp = 0;
-	
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 
 	unsigned int instPC = pc - 4;
 
@@ -108,13 +103,8 @@ void I_Type(unsigned int instWord)
 		case 0:    cout << "\tADDI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 		case 1:
-<<<<<<< HEAD
-			temp = imm & 0x0000001F; 
-			cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp << "\n";
-=======
 			temp = imm & 0x0000001F; //check if this is necessary
 			cout << "\tSLLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)temp << "\n";
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 			break;
 		case 2:
 			cout << "\tSLTI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
@@ -129,15 +119,9 @@ void I_Type(unsigned int instWord)
 			temp = (instWord >> 30) & 0x3;
 			temp2 = imm & 0x0000001F; 
 			if (temp == 0)
-<<<<<<< HEAD
-				cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp2 << "\n";
-			else
-				cout << "\tSRAI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp2 << "\n";
-=======
 				cout << "\tSRLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			else
 				cout << "\tSRAI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 			break;
 
 		case 6:
@@ -191,10 +175,6 @@ void I_Type(unsigned int instWord)
 void S_Type(unsigned int instWord)
 {
 	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
-<<<<<<< HEAD
-=======
-	
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 
 	unsigned int instPC = pc - 4;
 
@@ -232,10 +212,6 @@ void S_Type(unsigned int instWord)
 void U_Type(unsigned int instWord)
 {
 	unsigned int rd, imm, opcode;
-<<<<<<< HEAD
-=======
-	
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 
 	unsigned int instPC = pc - 4;
 
@@ -259,10 +235,6 @@ void U_Type(unsigned int instWord)
 void B_Type(unsigned int instWord)
 {
 	unsigned int rs1, rs2, funct3, imm, temp;
-<<<<<<< HEAD
-=======
-	
->>>>>>> 318e5f575444de7311745720fbd945ec239cf4c6
 
 	unsigned int instPC = pc - 4;
 
