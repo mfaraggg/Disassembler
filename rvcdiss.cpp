@@ -86,9 +86,10 @@ void R_Type(unsigned int instWord) //function for all R-Type instructions
 void I_Type(unsigned int instWord) //I Type instruction set
 {
 	unsigned int rd, rs1, funct3, opcode;
+
 	unsigned int imm; //holds the immediate value
 	unsigned int temp = 0, temp2 = 0;
-	
+
 
 	unsigned int instPC = pc - 4; 
 
@@ -118,8 +119,9 @@ void I_Type(unsigned int instWord) //I Type instruction set
 			cout << "\tXORI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 		case 5:
+
 			temp = (instWord >> 30) & 0x3; //compares the last 3 digits since they differ in SRLI and SRAI
-			temp2 = imm & 0x1F; //only the first 5 bits are represented in the assembly
+			temp2 = imm & 0x0000001F; //only the first 5 bits are represented in the assembly
 			if (temp == 0)
 				cout << "\tSRLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)temp2 << "\n";
 			else
@@ -177,7 +179,6 @@ void I_Type(unsigned int instWord) //I Type instruction set
 void S_Type(unsigned int instWord) //function for S Type instruction set
 {
 	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
-	
 
 	unsigned int instPC = pc - 4;
 
@@ -215,7 +216,6 @@ void S_Type(unsigned int instWord) //function for S Type instruction set
 void U_Type(unsigned int instWord) //instruction set for U type
 {
 	unsigned int rd, imm, opcode;
-	
 
 	unsigned int instPC = pc - 4;
 
@@ -239,7 +239,6 @@ void U_Type(unsigned int instWord) //instruction set for U type
 void B_Type(unsigned int instWord) //all B type functions
 {
 	unsigned int rs1, rs2, funct3, imm, temp;
-	
 
 	unsigned int instPC = pc - 4;
 
