@@ -239,8 +239,9 @@ void U_Type(unsigned int instWord)
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
-	imm = (instWord >> 12) & 0x000FFFFF;
+	imm = (instWord >> 12) & 0xFFF80000;
 	//imm = imm << 12;
+	imm = (imm) | (((instWord >> 31) ? 0xFFF00000 : 0x0));
 
 	printPrefix(instPC, instWord);
 
