@@ -104,7 +104,8 @@ void R_Type(unsigned int instWord)
 
 void I_Type(unsigned int instWord)
 {
-	unsigned int rd, rs1, imm, funct3, funct7 = 0, opcode;
+	unsigned int rd, rs1, funct3, funct7 = 0, opcode;
+	signed int imm;
 	unsigned int temp = 0;
 	//unsigned int address;
 
@@ -326,32 +327,26 @@ void J_Type(unsigned int instWord)
 	printPrefix(instPC, instWord);
 
 	cout << "\tJAL\tx" << rd << ", " << "0x" << hex << imm << "\n";
-	
-	
+		
 }
 void instDecExec(unsigned int instWord)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
-	//unsigned int address;
-
+	unsigned int opcode;
+	
 	unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x0000007F;
-	rd = (instWord >> 7) & 0x0000001F;
-	funct3 = (instWord >> 12) & 0x00000007;
-	rs1 = (instWord >> 15) & 0x0000001F;
-	rs2 = (instWord >> 20) & 0x0000001F;
 
-	if (opcode == 0x33) {	// R Instructions
+	if (opcode == 0x33) {// R Instructions
 		R_Type(instWord);
 	}
-	else if (opcode == 0x13 || opcode==0x3 || opcode == 0x67 || opcode == 0x73) {	// I instructions
+	else if (opcode == 0x13 || opcode==0x3 || opcode == 0x67 || opcode == 0x73) {// I instructions
 		I_Type(instWord);
 	}
-	else if (opcode == 0x23) {	// S Instructions
+	else if (opcode == 0x23) {// S Instructions
 		S_Type(instWord);
 	}
-	else if (opcode == 0x63){ // B Instructions
+	else if (opcode == 0x63){// B Instructions
 		B_Type(instWord);
 	}
 	else if (opcode == 0x17 || opcode == 0x37){ // U Instructions
@@ -364,7 +359,6 @@ void instDecExec(unsigned int instWord)
 		printPrefix(instPC, instWord);
 		cout << "\tUnknown Instruction \n";
 	}
-
 }
 
 int main(int argc, char* argv[]) {
