@@ -45,7 +45,7 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 void R_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
-	unsigned int address;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -104,9 +104,10 @@ void R_Type(unsigned int instWord)
 
 void I_Type(unsigned int instWord)
 {
-	unsigned int rd, rs1, imm, funct3, funct7 = 0, opcode;
+	unsigned int rd, rs1, funct3, opcode;
+	unsigned int imm;
 	unsigned int temp = 0;
-	unsigned int address;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -114,7 +115,7 @@ void I_Type(unsigned int instWord)
 	rd = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
-	imm = (instWord >> 20) & 0x00000FFF;
+	imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 
 	printPrefix(instPC, instWord);
 
@@ -175,10 +176,14 @@ void I_Type(unsigned int instWord)
 			cout << "\tUnknown I Instruction \n";
 
 		}
-	}else if (opcode == 0x67) { 
+	}
+	else if (opcode == 0x67) { 
 		
-		cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
-		
+		cout << "\tJALR\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";	
+	}
+	else if (opcode == 0x73)
+	{
+		cout << "\tECALL\n";
 	}
 	else {
 		cout << "\tUnknown Instruction \n";
@@ -189,19 +194,22 @@ void I_Type(unsigned int instWord)
 
 void S_Type(unsigned int instWord)
 {
-	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0, opcode;
-	unsigned int address;
+	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	imm1 = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
-	imm2 = (instWord >> 25) & 0x0000007F;
+	//imm2 = (instWord >> 25) & 0x0000007F;
+	imm2 = (instWord >> 25) & 0x0000003F;
 	imm = imm2;
 	imm = (imm2 << 5) | imm1;
+	imm = (imm) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+
 	printPrefix(instPC, instWord);
 
 	switch (funct3) {
@@ -225,21 +233,22 @@ void S_Type(unsigned int instWord)
 void U_Type(unsigned int instWord)
 {
 	unsigned int rd, imm, opcode;
-	unsigned int address;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
-	imm = (instWord >> 12) & 0x000FFFFF;
-	imm = imm << 12;
+	imm = (instWord >> 12) & 0x7FFFF;
+	//imm = imm << 12;
+	imm = (imm) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
 
 	printPrefix(instPC, instWord);
 
 	if (opcode == 0x37) 
-		cout << "\tLUI\tx" << rd << ", " << imm << "\n";
+		cout << "\tLUI\tx" << rd << ", " << hex << "0x" << imm << "\n";
 	else if (opcode == 0x17)
-		cout << "\tAUIPC\tx" << rd << ", " << imm << "\n";
+		cout << "\tAUIPC\tx" << rd << ", " << hex << "0x" << imm << "\n";
 	else
 		cout << "\tUnknown U Instruction \n";
 
@@ -247,12 +256,12 @@ void U_Type(unsigned int instWord)
 
 void B_Type(unsigned int instWord)
 {
-	unsigned int rs1, rs2, funct3, opcode, imm, temp;
-	unsigned int address;
+	unsigned int rs1, rs2, funct3, imm, temp;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
@@ -272,7 +281,6 @@ void B_Type(unsigned int instWord)
 
 	switch (funct3)
 	{
-		// For each case, should we increment PC
 	case 0: 
 	cout << "\tBEQ\tx" << rs1 << ", x" << rs2 << ", " << hex << "0x" << (int)imm << "\n";
 		break;
@@ -305,14 +313,13 @@ void B_Type(unsigned int instWord)
 
 void J_Type(unsigned int instWord)
 {
-	unsigned int rd, imm, opcode, temp;
-	unsigned int address;
+	unsigned int rd, imm, temp;
+	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
-	//
 	imm = (instWord >> 12) & 0x000000FF;
 	temp = (instWord >> 20) & 0x000001;
 	imm = imm + temp;
@@ -324,37 +331,26 @@ void J_Type(unsigned int instWord)
 	printPrefix(instPC, instWord);
 
 	cout << "\tJAL\tx" << rd << ", " << "0x" << hex << imm << "\n";
-	
-	
+		
 }
 void instDecExec(unsigned int instWord)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
-	unsigned int I_imm, S_imm, B_imm, U_imm, J_imm;
-	unsigned int address;
-
+	unsigned int opcode;
+	
 	unsigned int instPC = pc - 4;
 
 	opcode = instWord & 0x0000007F;
-	rd = (instWord >> 7) & 0x0000001F;
-	funct3 = (instWord >> 12) & 0x00000007;
-	rs1 = (instWord >> 15) & 0x0000001F;
-	rs2 = (instWord >> 20) & 0x0000001F;
 
-	// — inst[31] — inst[30:25] inst[24:21] inst[20]
-	I_imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
-
-
-	if (opcode == 0x33) {		// R Instructions
+	if (opcode == 0x33) {// R Instructions
 		R_Type(instWord);
 	}
-	else if (opcode == 0x13 || opcode==0x3 || opcode == 0x67) {	// I instructions
+	else if (opcode == 0x13 || opcode==0x3 || opcode == 0x67 || opcode == 0x73) {// I instructions
 		I_Type(instWord);
 	}
-	else if (opcode == 0x23) {		// S Instructions
+	else if (opcode == 0x23) {// S Instructions
 		S_Type(instWord);
 	}
-	else if (opcode == 0x63){ // B Instructions
+	else if (opcode == 0x63){// B Instructions
 		B_Type(instWord);
 	}
 	else if (opcode == 0x17 || opcode == 0x37){ // U Instructions
@@ -367,7 +363,6 @@ void instDecExec(unsigned int instWord)
 		printPrefix(instPC, instWord);
 		cout << "\tUnknown Instruction \n";
 	}
-
 }
 
 int main(int argc, char* argv[]) {
@@ -394,8 +389,6 @@ int main(int argc, char* argv[]) {
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
 			pc += 4;
-			// remove the following line once you have a complete simulator
-			// if (pc == 200) break;			// stop when PC reached address 32
 			opcode = instWord & 0x0000007F;
 			if(opcode == 0x0) break; // Stops when opcode is 0
 			instDecExec(instWord);
@@ -403,16 +396,3 @@ int main(int argc, char* argv[]) {
 	}
 	else emitError("Cannot access input file\n");
 }
-
-// int main() {
-
-// 	unsigned int rd, imm, opcode;
-// 	unsigned int instWord = 2829899366;
-// 	opcode = instWord & 0x0000007F;
-// 	rd = (instWord >> 7) & 0x0000001F;
-// 	imm = (instWord >> 12) & 0x000FFFFF;
-// 	cout << "and: " << imm << endl;
-// 	imm = imm << 12;
-// 	cout << "shift: " << imm << endl;
-// 	cout << "hex: " << hex << "0x" << imm;
-// }
