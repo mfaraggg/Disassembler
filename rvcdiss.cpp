@@ -105,7 +105,7 @@ void R_Type(unsigned int instWord)
 void I_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, funct3, opcode;
-	signed int imm;
+	unsigned int imm;
 	unsigned int temp = 0;
 	//unsigned int address;
 
