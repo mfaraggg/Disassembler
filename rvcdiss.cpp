@@ -115,7 +115,7 @@ void I_Type(unsigned int instWord)
 	rd = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
-	imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0x800 : 0x0));
 
 	printPrefix(instPC, instWord);
 
@@ -204,9 +204,11 @@ void S_Type(unsigned int instWord)
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
-	imm2 = (instWord >> 25) & 0x0000007F;
+	//imm2 = (instWord >> 25) & 0x0000007F;
+	imm2 = (instWord >> 25) & 0x0000003F;
 	imm = imm2;
 	imm = (imm2 << 5) | imm1;
+	//imm = (imm) | (((instWord >> 31) ? 0x40 : 0x0));
 	printPrefix(instPC, instWord);
 
 	switch (funct3) {
