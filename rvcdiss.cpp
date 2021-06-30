@@ -1,25 +1,3 @@
-/*
-	This is just a skeleton. It DOES NOT implement all the requirements.
-	It only recognizes the RV32I "ADD", "SUB" and "ADDI" instructions only.
-	It prints "Unknown Instruction" for all other instructions!
-
-	Usage example:
-		$ rvcdiss t1.bin
-	should print out:
-		0x00000000	0x00100013	ADDI	x0, x0, 0x1
-		0x00000004	0x00100093	ADDI	x1, x0, 0x1
-		0x00000008	0x00100113	ADDI	x2, x0, 0x1
-		0x0000000c	0x001001b3	ADD		x3, x0, x1
-		0x00000010	0x00208233	ADD		x4, x1, x2
-		0x00000014	0x004182b3	ADD		x5, x3, x4
-		0x00000018	0x00100893	ADDI	x11, x0, 0x1
-		0x0000001c	0x00028513	ADDI	xa, x5, 0x0
-		0x00000020	0x00000073	Unknown Instruction
-	References:
-	(1) The risc-v ISA Manual ver. 2.1 @ https://riscv.org/specifications/
-	(2) https://github.com/michaeljclark/riscv-meta/blob/master/meta/opcodes
-*/
-
 #include <iostream>
 #include <fstream>
 #include "stdlib.h"
@@ -45,7 +23,6 @@ void printPrefix(unsigned int instA, unsigned int instW) {
 void R_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
-	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -106,8 +83,7 @@ void I_Type(unsigned int instWord)
 {
 	unsigned int rd, rs1, funct3, opcode;
 	unsigned int imm;
-	unsigned int temp = 0;
-	//unsigned int address;
+	unsigned int temp = 0, temp2 = 0;
 
 	unsigned int instPC = pc - 4;
 
@@ -124,7 +100,7 @@ void I_Type(unsigned int instWord)
 		case 0:    cout << "\tADDI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 		case 1:
-			temp = imm & 0x0000001F; //check if this is necessary
+			temp = imm & 0x0000001F; 
 			cout << "\tSLLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp << "\n";
 			break;
 		case 2:
@@ -138,10 +114,11 @@ void I_Type(unsigned int instWord)
 			break;
 		case 5:
 			temp = (instWord >> 30) & 0x3;
+			temp2 = imm & 0x0000001F; 
 			if (temp == 0)
-				cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tSRLI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp2 << "\n";
 			else
-				cout << "\tSRAI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tSRAI\tx" << rd << ", x" << rs1 << ", " << hex << "0x" << (int)temp2 << "\n";
 			break;
 
 		case 6:
@@ -195,7 +172,6 @@ void I_Type(unsigned int instWord)
 void S_Type(unsigned int instWord)
 {
 	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
-	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -233,7 +209,6 @@ void S_Type(unsigned int instWord)
 void U_Type(unsigned int instWord)
 {
 	unsigned int rd, imm, opcode;
-	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -257,7 +232,6 @@ void U_Type(unsigned int instWord)
 void B_Type(unsigned int instWord)
 {
 	unsigned int rs1, rs2, funct3, imm, temp;
-	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
@@ -314,7 +288,6 @@ void B_Type(unsigned int instWord)
 void J_Type(unsigned int instWord)
 {
 	unsigned int rd, imm, temp;
-	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
