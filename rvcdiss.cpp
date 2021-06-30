@@ -115,7 +115,7 @@ void I_Type(unsigned int instWord)
 	rd = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
-	imm = (instWord >> 20) & 0x00000FFF;
+	imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 
 	printPrefix(instPC, instWord);
 
