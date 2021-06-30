@@ -104,7 +104,7 @@ void R_Type(unsigned int instWord)
 
 void I_Type(unsigned int instWord)
 {
-	unsigned int rd, rs1, funct3, funct7 = 0, opcode;
+	unsigned int rd, rs1, funct3, opcode;
 	signed int imm;
 	unsigned int temp = 0;
 	//unsigned int address;
@@ -194,12 +194,12 @@ void I_Type(unsigned int instWord)
 
 void S_Type(unsigned int instWord)
 {
-	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0, opcode;
+	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
 	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	imm1 = (instWord >> 7) & 0x0000001F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
@@ -252,12 +252,12 @@ void U_Type(unsigned int instWord)
 
 void B_Type(unsigned int instWord)
 {
-	unsigned int rs1, rs2, funct3, opcode, imm, temp;
+	unsigned int rs1, rs2, funct3, imm, temp;
 	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
@@ -309,12 +309,12 @@ void B_Type(unsigned int instWord)
 
 void J_Type(unsigned int instWord)
 {
-	unsigned int rd, imm, opcode, temp;
+	unsigned int rd, imm, temp;
 	//unsigned int address;
 
 	unsigned int instPC = pc - 4;
 
-	opcode = instWord & 0x0000007F;
+	//opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
 	imm = (instWord >> 12) & 0x000000FF;
 	temp = (instWord >> 20) & 0x000001;
