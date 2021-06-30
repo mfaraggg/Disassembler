@@ -9,38 +9,39 @@ unsigned int pc = 0x0;
 
 char memory[8 * 1024];	// only 8KB of memory located at address 0
 
+//all ABI register names are added into array of strings and will be called when outputting
 string ABI[32] = { "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2", "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
 		"s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6" };
 
-void emitError(string s)
+void emitError(string s) //used to output an error message
 {
 	cout << s;
 	exit(0);
 }
 
-void printPrefix(unsigned int instA, unsigned int instW) {
+void printPrefix(unsigned int instA, unsigned int instW) { //outputs the machine code in hexadecimal and the PC address
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
 
 
-void R_Type(unsigned int instWord)
+void R_Type(unsigned int instWord) //function for all R-Type instructions
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
 
-	unsigned int instPC = pc - 4;
+	unsigned int instPC = pc - 4; //
 
-	opcode = instWord & 0x0000007F;
-	rd = (instWord >> 7) & 0x0000001F;
-	funct3 = (instWord >> 12) & 0x00000007;
-	rs1 = (instWord >> 15) & 0x0000001F;
-	rs2 = (instWord >> 20) & 0x0000001F;
-	funct7 = (instWord >> 25) & 0x0000007F;
+	opcode = instWord & 0x0000007F; //inserts first 7 bits in opcode
+	rd = (instWord >> 7) & 0x0000001F; //next 5 bits
+	funct3 = (instWord >> 12) & 0x00000007; //next 3 bits
+	rs1 = (instWord >> 15) & 0x0000001F; //next 5 bits
+	rs2 = (instWord >> 20) & 0x0000001F; //next 5 bits
+	funct7 = (instWord >> 25) & 0x0000007F; //final 7 bits
 
 	printPrefix(instPC, instWord);
 
-	switch (funct3) {
+	switch (funct3) { //all r type functions depend on funct3
 	case 0:
-		if (funct7 == 0)
+		if (funct7 == 0) //funct7 is needed since 2 instructions have same funct3
 			cout << "\tADD\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
 		else
 			cout << "\tSUB\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
@@ -63,7 +64,7 @@ void R_Type(unsigned int instWord)
 		break;
 
 	case 5:
-		if (funct7 == 0)
+		if (funct7 == 0) //conflicting funct3 codes need an if to compare funct7
 			cout << "\tSRL\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
 		else
 			cout << "\tSRA\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
@@ -82,14 +83,14 @@ void R_Type(unsigned int instWord)
 	}
 }
 
-void I_Type(unsigned int instWord)
+void I_Type(unsigned int instWord) //I Type instruction set
 {
 	unsigned int rd, rs1, funct3, opcode;
-	unsigned int imm;
-	unsigned int temp = 0;
+	unsigned int imm; //holds the immediate value
+	unsigned int temp = 0, temp2 = 0;
 	
 
-	unsigned int instPC = pc - 4;
+	unsigned int instPC = pc - 4; 
 
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
@@ -117,11 +118,12 @@ void I_Type(unsigned int instWord)
 			cout << "\tXORI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 		case 5:
-			temp = (instWord >> 30) & 0x3;
+			temp = (instWord >> 30) & 0x3; //compares the last 3 digits since they differ in SRLI and SRAI
+			temp2 = imm & 0x1F; //only the first 5 bits are represented in the assembly
 			if (temp == 0)
-				cout << "\tSRLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tSRLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)temp2 << "\n";
 			else
-				cout << "\tSRAI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tSRAI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)temp2 << "\n";
 			break;
 
 		case 6:
@@ -157,11 +159,11 @@ void I_Type(unsigned int instWord)
 
 		}
 	}
-	else if (opcode == 0x67) {
+	else if (opcode == 0x67) { //JALR
 
 		cout << "\tJALR\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 	}
-	else if (opcode == 0x73)
+	else if (opcode == 0x73) //ecall
 	{
 		cout << "\tECALL\n";
 	}
@@ -172,7 +174,7 @@ void I_Type(unsigned int instWord)
 }
 
 
-void S_Type(unsigned int instWord)
+void S_Type(unsigned int instWord) //function for S Type instruction set
 {
 	unsigned int rs1, rs2, funct3, imm1, imm2, imm = 0;
 	
@@ -180,15 +182,15 @@ void S_Type(unsigned int instWord)
 	unsigned int instPC = pc - 4;
 
 	//opcode = instWord & 0x0000007F;
-	imm1 = (instWord >> 7) & 0x0000001F;
+	imm1 = (instWord >> 7) & 0x0000001F; //stores least siginigcant part of the imm
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
 	//imm2 = (instWord >> 25) & 0x0000007F;
-	imm2 = (instWord >> 25) & 0x0000003F;
+	imm2 = (instWord >> 25) & 0x0000003F; //stores most signifcant half
 	imm = imm2;
-	imm = (imm2 << 5) | imm1;
-	imm = (imm) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	imm = (imm2 << 5) | imm1; //concatenates the 2 values
+	imm = (imm) | (((instWord >> 31) ? 0xFFFFF800 : 0x0)); //makes sure values will appear as signed
 
 	printPrefix(instPC, instWord);
 
@@ -210,7 +212,7 @@ void S_Type(unsigned int instWord)
 	}
 }
 
-void U_Type(unsigned int instWord)
+void U_Type(unsigned int instWord) //instruction set for U type
 {
 	unsigned int rd, imm, opcode;
 	
@@ -225,7 +227,7 @@ void U_Type(unsigned int instWord)
 
 	printPrefix(instPC, instWord);
 
-	if (opcode == 0x37)
+	if (opcode == 0x37) //the two U type functions have different opcodes
 		cout << "\tLUI\t" << ABI[rd] << ", " << hex << "0x" << imm << "\n";
 	else if (opcode == 0x17)
 		cout << "\tAUIPC\t" << ABI[rd] << ", " << hex << "0x" << imm << "\n";
@@ -234,7 +236,7 @@ void U_Type(unsigned int instWord)
 
 }
 
-void B_Type(unsigned int instWord)
+void B_Type(unsigned int instWord) //all B type functions
 {
 	unsigned int rs1, rs2, funct3, imm, temp;
 	
@@ -291,7 +293,7 @@ void B_Type(unsigned int instWord)
 
 }
 
-void J_Type(unsigned int instWord)
+void J_Type(unsigned int instWord) //J Type instruction set
 {
 	unsigned int rd, imm, temp;
 
@@ -312,7 +314,7 @@ void J_Type(unsigned int instWord)
 	cout << "\tJAL\t" << ABI[rd] << ", " << "0x" << hex << imm << "\n";
 
 }
-void instDecExec(unsigned int instWord)
+void instDecExec(unsigned int instWord) //main function that calls all other functions(R,I,J,U,B,S types)
 {
 	unsigned int opcode;
 
