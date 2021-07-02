@@ -301,19 +301,19 @@ void I_Type(unsigned int instWord) //I Type instruction set
 	else if (opcode == 0x3) {    // I-load instructions
 		switch (funct3) {
 		case 0:
-			cout << "\tLB\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLB\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 1:
-			cout << "\tLH\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLH\t" << ABI[rd]  << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 2:
-			cout << "\tLW\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLW\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 4:
-			cout << "\tLBU\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLBU\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 5:
-			cout << "\tLHU\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLHU\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		default:
 			cout << "\tUnknown I Instruction \n";
