@@ -23,7 +23,167 @@ void printPrefix(unsigned int instA, unsigned int instW) { //outputs the machine
 	cout << "0x" << hex << std::setfill('0') << std::setw(8) << instA << "\t0x" << std::setw(8) << instW;
 }
 
+void compressedInst(unsigned int instWord)
+{
+	unsigned int rd, rs1, rs2, funct3, opcode;
+	unsigned int imm, imm1, imm2;
+	unsigned int instPC = pc - 4; //
+	//imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	opcode = instWord & 0x3; 
+	funct3 = (instWord >> 12) & 0x7;
+	printPrefix(instPC, instWord);
 
+	if (opcode == 0)
+	{
+		imm1 = (instWord >> 5) & 0x1;
+		imm2 = (instWord >> 10) & 0x7;
+		imm = (imm1 << 3) | (imm2);
+		imm = (imm << 1) | ((instWord >> 6) & 0x1);
+		imm = ((imm) & 0xF) | (((imm >> 4) ? 0xFFE0 : 0x0));
+		rd = (instWord >> 2) & 0x7;
+		rs1 = (instWord >> 7) & 0x7;
+		switch(funct3)
+		{
+			case 2:
+				cout << "\tC.LW\t" << ABI[rd] << ", " << ABI[rs1]  << ", " << hex << "0x" << (int)imm << "\n" ;
+				break;
+
+			case 6:
+				cout << "\tC.SW\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")" << "\n";
+				//rd is rs2
+				break;
+			default:
+				cout << "\tUnknown Compressed Instruction \n";
+		}
+	}
+	else if (opcode == 1)
+	{
+		switch(funct3)
+		{
+			case 0: // C.ADDI
+				imm1 = ((instWord >> 2) & 0x1F);
+				imm2 = ((instWord >> 12) & 0x1);
+				imm = (imm2 << 5) | imm1;
+				if (imm==0)
+					break;
+				rs1 = (instWord >> 7) & 0x1F;
+				if (rs1 == 0)
+					break;
+				cout << "\tC.ADDI\t" << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				break;
+
+			case 1: //C.JAL
+				imm1 = (instWord >> 3) & 0x7;
+				imm2 = (instWord >> 11) & 0x1;
+				imm = (imm2 << 3) | (imm1); // adding Imm[3:1] to Imm[4]
+				imm = (((instWord >> 2)&0x1) << 4)| imm; // adding Imm[5]
+				imm = (((instWord >> 7) & 0x1) << 5) | imm;// adding Imm[6]
+				imm = (((instWord >> 6 )& 0x1) << 6) | imm; // adding Imm[7]
+				imm = (((instWord >> 9) & 0x3) << 8) | imm; // adding Imm[9:8]
+				imm = (((instWord >> 8) & 0x1) << 9) | imm; // adding Imm[10]
+				imm = (((instWord >> 12) & 0x1) << 10) | imm ; // adding Imm[11]
+				cout << "\tC.JAL\t" << "0x" << hex << imm << "\n";
+				break;
+			
+			case 3:
+			
+				imm1 = (instWord >> 2) & 0x1F;
+				imm2 = (instWord >> 12) & 0x1;
+				imm = (imm2 << 5) | imm1;
+				if (imm==0)
+					break;
+				rd = (instWord >> 7) & 0x1F;
+				if ((rd == 0) || (rd == 2))
+					break;
+				cout << "\tC.LUI\t" << ABI[rd] << ", " << hex << "0x" << imm << "\n";
+				break;	
+
+			case 4: 
+				rs1 = (instWord >> 7) & 0x7;
+				int temp = (instWord >> 10) & 0x3;
+				imm1 = ((instWord >> 2) & 0x1F);
+				imm2 = ((instWord >> 12) & 0x1);
+				imm = (imm2 << 5) | imm1;
+				if (temp == 2)
+				{
+					cout << "\tC.ANDI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+					break;
+				}
+				if (imm == 0)
+					break;
+				rs1 = (instWord >> 7) & 0x1F;
+				if (temp == 0)
+				{
+					cout << "\tC.SRLI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+					break;
+				}
+				else if (temp == 1)
+				{
+					cout << "\tC.SRAI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+					break;
+				}
+				else
+				{
+					rs2 = ((instWord >> 2) & 0x7);
+					temp = ((instWord >> 5) & 0x3);
+					switch (temp)
+					{
+						case 0:
+							cout << "\tC.SUB\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+							break;
+						case 1:
+							cout << "\tC.XOR\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+							break;
+						case 2:
+							cout << "\tC.OR\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+							break;
+						case 3:
+							cout << "\tC.AND\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+							break;
+						default:
+							cout << "Unknown Compressed Instruction" << endl;
+							break;
+					}
+				}
+		}
+	}
+	else if (opcode == 2)
+	{
+		switch(funct3)
+		{
+			case 0: // C.SLLI
+				imm1 = ((instWord >> 2) & 0x1F);
+				imm2 = ((instWord >> 12) & 0x1);
+				imm = (imm2 << 5) | imm1;
+				if (imm==0)
+					break;
+				rs1 = (instWord >> 7) & 0x1F;
+				if (rs1 == 0)
+					break;
+				cout << "\tC.SLLI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				break;
+			case 4:
+				rs1 = (instWord >> 7) & 0x1F;
+				rs2 = (instWord >> 2) & 0x1F;
+				if (rs1 == 0)
+				{
+					cout << "\tC.EBREAK\t" << endl;
+					break;
+				}
+				else if (rs2 == 0)
+				{
+					cout << "\tC.JALR\t" << ABI[rs1] << "\n"; 
+					break;
+				}
+				else
+				{
+					cout << "\tC.ADD\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+					break;
+				}
+		}
+	}
+
+}
 void R_Type(unsigned int instWord) //function for all R-Type instructions
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
@@ -142,19 +302,19 @@ void I_Type(unsigned int instWord) //I Type instruction set
 	else if (opcode == 0x3) {    // I-load instructions
 		switch (funct3) {
 		case 0:
-			cout << "\tLB\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLB\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 1:
-			cout << "\tLH\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLH\t" << ABI[rd]  << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 2:
-			cout << "\tLW\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLW\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 4:
-			cout << "\tLBU\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLBU\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		case 5:
-			cout << "\tLHU\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tLHU\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")"  << "\n";
 			break;
 		default:
 			cout << "\tUnknown I Instruction \n";
