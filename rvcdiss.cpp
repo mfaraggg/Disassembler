@@ -62,7 +62,19 @@ void compressedInst(unsigned int instWord)
 	{
 		switch(funct3)
 		{
-			case 1:
+			case 0: // C.ADDI
+				imm1 = ((instWord >> 2) & 0x1F);
+				imm2 = ((instWord >> 12) & 0x1);
+				imm = (imm2 << 5) | imm1;
+				if (imm==0)
+					break;
+				rs1 = (instWord >> 7) & 0x1F;
+				if (rs1 == 0)
+					break;
+				cout << "\tC.ADDI\t" << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				break;
+
+			case 1: //C.JAL
 				imm1 = (instWord >> 3) & 0x7;
 				imm2 = (instWord >> 11) & 0x1;
 				imm = (imm2 << 3) | (imm1); // adding Imm[3:1] to Imm[4]
@@ -94,7 +106,18 @@ void compressedInst(unsigned int instWord)
 	{
 		switch(funct3)
 		{
-			case 4:
+			case 0: // C.SLLII
+				imm1 = ((instWord >> 2) & 0x1F);
+				imm2 = ((instWord >> 12) & 0x1);
+				imm = (imm2 << 5) | imm1;
+				if (imm==0)
+					break;
+				rs1 = (instWord >> 7) & 0x1F;
+				if (rs1 == 0)
+					break;
+				cout << "\tC.SLLI\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				break;
+			case 4: // C.JALR
 				rs1 = (instWord >> 7) & 0x1F;
 				if (rs1 == 0)
 					break;
