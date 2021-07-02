@@ -39,7 +39,7 @@ void compressedInst(unsigned int instWord)
 		imm2 = (instWord >> 10) & 0x7;
 		imm = (imm1 << 3) | (imm2);
 		imm = (imm << 1) | ((instWord >> 6) & 0x1);
-		imm = ((imm) & 0xF) | (((instWord >> 15) ? 0xFFFFF800 : 0x0));
+		imm = ((imm) & 0xF) | (((imm >> 4) ? 0xFFFFF800 : 0x0));
 		rd = (instWord >> 2) & 0x7;
 		rs1 = (instWord >> 7) & 0x7;
 		switch(funct3)
