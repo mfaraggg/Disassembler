@@ -25,12 +25,13 @@ void printPrefix(unsigned int instA, unsigned int instW) { //outputs the machine
 
 void compressedInst(unsigned int instWord)
 {
-	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
+	unsigned int rd, rs1, rs2, funct3, opcode;
 	unsigned int imm, imm1, imm2;
 	unsigned int instPC = pc - 4; //
 
 	opcode = instWord & 0x3; 
 	funct3 = (instWord >> 12) & 0x7;
+	printPrefix(instPC, instWord);
 
 	if (opcode == 0)
 	{
