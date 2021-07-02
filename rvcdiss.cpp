@@ -28,7 +28,7 @@ void compressedInst(unsigned int instWord)
 	unsigned int rd, rs1, rs2, funct3, opcode;
 	unsigned int imm, imm1, imm2;
 	unsigned int instPC = pc - 4; //
-
+	//imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	opcode = instWord & 0x3; 
 	funct3 = (instWord >> 12) & 0x7;
 	printPrefix(instPC, instWord);
