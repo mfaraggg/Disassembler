@@ -527,6 +527,10 @@ int main(int argc, char* argv[]) {
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
 		while (true) {
+			for (int i = 0 ; i < 5 ; i++)
+			{
+				cout << memory[i] << endl;
+			}
 			instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
