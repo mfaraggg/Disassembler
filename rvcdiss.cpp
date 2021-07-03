@@ -526,19 +526,30 @@ int main(int argc, char* argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
-			for (int i = 0 ; i < 5 ; i++)
+			for (int i = 0 ; i < 6 ; i++)
 			{
 				cout << memory[i] << endl;
 			}
 		while (true) {
-			instWord = (unsigned char)memory[pc] |
+			if (((unsigned char)memory[pc] & 0x3) == 3)
+			{
+				instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
-			pc += 4;
-			opcode = instWord & 0x0000007F;
+				opcode = instWord & 0x0000007F;
 			if (opcode == 0x0) break; // Stops when opcode is 0
-			instDecExec(instWord);
+				instDecExec(instWord);
+			}
+			else
+			{
+				instWord = (unsigned char)memory[pc] |
+				(((unsigned char)memory[pc + 1]) << 8);
+				opcode = instWord & 0x0000003;
+				if (opcode == 0x0) break; // Stops when opcode is 0
+				compressedInst(instWord);
+			}
+			pc += 4;
 		}
 	}
 	else emitError("Cannot access input file\n");
