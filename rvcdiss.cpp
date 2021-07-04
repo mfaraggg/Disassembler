@@ -468,20 +468,26 @@ void B_Type(unsigned int instWord) //all B type functions
 
 void J_Type(unsigned int instWord) //J Type instruction set
 {
-	unsigned int rd, imm, temp;
+	unsigned int rd, imm, imm2, temp;
 
 	unsigned int instPC = pc - 4;
 
-	//opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
+	
 	imm = (instWord >> 12) & 0x000000FF;
 	temp = (instWord >> 20) & 0x000001;
-	imm = imm + temp;
-	imm = (instWord >> 21) & 0x00003FF;
-	temp = (instWord >> 30) & 0x00001;
-	imm = imm + temp;
+	// temp = temp << 8;
+	temp = (imm << 1) | temp;
 
-	imm = imm << 1;
+	// imm = imm + temp;
+	imm = (instWord >> 21) & 0x00003FF;
+	temp = (temp << 10) | imm;
+	imm2 = (instWord << 31) & 0x00001;
+	temp = (temp << 1) | imm2;
+
+	// imm = imm + temp;
+	imm = temp;
+	// imm = imm << 1;
 	printPrefix(instPC, instWord);
 
 	cout << "\tJAL\t" << ABI[rd] << ", " << "0x" << hex << imm << "\n";
