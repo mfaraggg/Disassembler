@@ -33,7 +33,7 @@ void compressedInst(unsigned int instWord)
 	funct3 = (instWord >> 12) & 0x7;
 	printPrefix(instPC, instWord);
 
-	if (opcode == 0)
+	if (opcode == 0x0)
 	{
 		imm1 = (instWord >> 5) & 0x1;
 		imm2 = (instWord >> 10) & 0x7;
@@ -56,7 +56,7 @@ void compressedInst(unsigned int instWord)
 			cout << "\tUnknown Compressed Instruction \n";
 		}
 	}
-	else if (opcode == 1)
+	else if (opcode == 0x1)
 	{
 		switch (funct3)
 		{
@@ -150,7 +150,7 @@ void compressedInst(unsigned int instWord)
 			}
 		}
 	}
-	else if (opcode == 2)
+	else if (opcode == 0x2)
 	{
 		switch (funct3)
 		{
@@ -548,7 +548,7 @@ int main(int argc, char* argv[]) {
 				(((unsigned char)memory[pc + 1]) << 8);
 				opcode = instWord & 0x0000003;
 				pc += 2;
-				if (opcode == 0x0) break; // Stops when opcode is 0
+				if (pc==10) break; // Stops when opcode is 0
 				compressedInst(instWord);
 			}
 			
