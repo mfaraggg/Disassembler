@@ -27,7 +27,7 @@ void compressedInst(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, opcode;
 	unsigned int imm, imm1, imm2;
-	unsigned int instPC = pc - 4; //
+	unsigned int instPC = pc - 2; //
 	//imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	opcode = instWord & 0x3;
 	funct3 = (instWord >> 12) & 0x7;
@@ -526,10 +526,10 @@ int main(int argc, char* argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
-			for (int i = 0 ; i < 6 ; i++)
-			{
-				cout << memory[i] << endl;
-			}
+			// for (int i = 0 ; i < 6 ; i++)
+			// {
+			// 	cout << memory[i] << endl;
+			// }
 		while (true) {
 			if (((unsigned char)memory[pc] & 0x3) == 3)
 			{
@@ -538,6 +538,7 @@ int main(int argc, char* argv[]) {
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
 				opcode = instWord & 0x0000007F;
+				pc += 4;
 			if (opcode == 0x0) break; // Stops when opcode is 0
 				instDecExec(instWord);
 			}
@@ -546,10 +547,11 @@ int main(int argc, char* argv[]) {
 				instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8);
 				opcode = instWord & 0x0000003;
+				pc += 2;
 				if (opcode == 0x0) break; // Stops when opcode is 0
 				compressedInst(instWord);
 			}
-			pc += 4;
+			
 		}
 	}
 	else emitError("Cannot access input file\n");
