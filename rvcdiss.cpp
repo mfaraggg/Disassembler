@@ -3,6 +3,7 @@
 #include "stdlib.h"
 #include <iomanip>
 #include <string>
+#include <bitset>
 using namespace std;
 
 unsigned int pc = 0x0;
@@ -27,13 +28,13 @@ void compressedInst(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, opcode;
 	unsigned int imm, imm1, imm2;
-	unsigned int instPC = pc - 4; //
+	unsigned int instPC = pc - 2; //
 	//imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
 	opcode = instWord & 0x3;
-	funct3 = (instWord >> 12) & 0x7;
+	funct3 = (instWord >> 13) & 0x7;
 	printPrefix(instPC, instWord);
 
-	if (opcode == 0)
+	if (opcode == 0x0)
 	{
 		imm1 = (instWord >> 5) & 0x1;
 		imm2 = (instWord >> 10) & 0x7;
@@ -45,18 +46,18 @@ void compressedInst(unsigned int instWord)
 		switch (funct3)
 		{
 		case 2:
-			cout << "\tC.LW\t" << ABI[rd] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			cout << "\tC.LW\t" << ABI[rd+8] << ", " << ABI[rs1+8] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 
 		case 6:
-			cout << "\tC.SW\t" << ABI[rd] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1] << ")" << "\n";
+			cout << "\tC.SW\t" << ABI[rd+8] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1+8] << ")" << "\n";
 			//rd is rs2
 			break;
 		default:
 			cout << "\tUnknown Compressed Instruction \n";
 		}
 	}
-	else if (opcode == 1)
+	else if (opcode == 0x1)
 	{
 		switch (funct3)
 		{
@@ -65,11 +66,15 @@ void compressedInst(unsigned int instWord)
 			imm2 = ((instWord >> 12) & 0x1);
 			imm = (imm2 << 5) | imm1;
 			imm = ((imm) & 0x1F) | (((imm >> 5) ? 0xFFC0 : 0x0));
-			if (imm == 0)
+			if (imm == 0) {
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 			rs1 = (instWord >> 7) & 0x1F;
-			if (rs1 == 0)
+			if (rs1 == 0) {
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 			cout << "\tC.ADDI\t" << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 
@@ -102,6 +107,7 @@ void compressedInst(unsigned int instWord)
 
 		case 4: //ANDI
 			rs1 = (instWord >> 7) & 0x7;
+			//cout << "''''''" << bitset<16>(instWord)<< "............."<<endl;
 			int temp = (instWord >> 10) & 0x3;
 			imm1 = ((instWord >> 2) & 0x1F);
 			imm2 = ((instWord >> 12) & 0x1);
@@ -109,20 +115,20 @@ void compressedInst(unsigned int instWord)
 			imm = ((imm) & 0x1F) | (((imm >> 5) ? 0xFFC0 : 0x0));
 			if (temp == 2)
 			{
-				cout << "\tC.ANDI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tC.ANDI\t" << ABI[rs1+8] << ", " << hex << "0x" << (int)imm << "\n";
 				break;
 			}
 			if (imm == 0)
 				break;
-			rs1 = (instWord >> 7) & 0x1F;
+			//rs1 = (instWord >> 7) & 0x1F;
 			if (temp == 0)
 			{
-				cout << "\tC.SRLI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tC.SRLI\t" << ABI[rs1+8] << ", " << hex << "0x" << (int)imm << "\n";
 				break;
 			}
 			else if (temp == 1)
 			{
-				cout << "\tC.SRAI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+				cout << "\tC.SRAI\t" << ABI[rs1+8] << ", " << hex << "0x" << (int)imm << "\n";
 				break;
 			}
 			else
@@ -132,25 +138,25 @@ void compressedInst(unsigned int instWord)
 				switch (temp)
 				{
 				case 0:
-					cout << "\tC.SUB\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+					cout << "\tC.SUB\t" << ABI[rs1+8] << ", " << ABI[rs2+8] << "\n";
 					break;
 				case 1:
-					cout << "\tC.XOR\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+					cout << "\tC.XOR\t" << ABI[rs1+8] << ", " << ABI[rs2+8] << "\n";
 					break;
 				case 2:
-					cout << "\tC.OR\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+					cout << "\tC.OR\t" << ABI[rs1+8] << ", " << ABI[rs2+8] << "\n";
 					break;
 				case 3:
-					cout << "\tC.AND\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+					cout << "\tC.AND\t" << ABI[rs1+8] << ", " << ABI[rs2+8] << "\n";
 					break;
 				default:
-					cout << "Unknown Compressed Instruction" << endl;
+					cout << "\tUnknown Compressed Instruction" << endl;
 					break;
 				}
 			}
 		}
 	}
-	else if (opcode == 2)
+	else if (opcode == 0x2)
 	{
 		switch (funct3)
 		{
@@ -161,9 +167,11 @@ void compressedInst(unsigned int instWord)
 			if (imm == 0)
 				break;
 			rs1 = (instWord >> 7) & 0x1F;
-			if (rs1 == 0)
+			if (rs1 == 0) {
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
-			cout << "\tC.SLLI\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
+			}
+			cout << "\tC.SLLI\t" << ABI[rs1] << ", " << hex << "0x" << (int)imm << "\n";
 			break;
 		case 4:
 			rs1 = (instWord >> 7) & 0x1F;
@@ -180,9 +188,12 @@ void compressedInst(unsigned int instWord)
 			}
 			else
 			{
-				cout << "\tC.ADD\t" << ABI[rs1] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+				cout << "\tC.ADD\t" << ABI[rs1] << ", " << ABI[rs2] << "\n";
 				break;
 			}
+		default:
+			cout << "\tUnknown Compressed Instruction" << endl;
+			break;
 		}
 	}
 
@@ -526,30 +537,32 @@ int main(int argc, char* argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
-			for (int i = 0 ; i < 6 ; i++)
-			{
-				cout << memory[i] << endl;
-			}
+		// for (int i = 0 ; i < 6 ; i++)
+		// {
+		// 	cout << memory[i] << endl;
+		// }
 		while (true) {
 			if (((unsigned char)memory[pc] & 0x3) == 3)
 			{
 				instWord = (unsigned char)memory[pc] |
-				(((unsigned char)memory[pc + 1]) << 8) |
-				(((unsigned char)memory[pc + 2]) << 16) |
-				(((unsigned char)memory[pc + 3]) << 24);
+					(((unsigned char)memory[pc + 1]) << 8) |
+					(((unsigned char)memory[pc + 2]) << 16) |
+					(((unsigned char)memory[pc + 3]) << 24);
 				opcode = instWord & 0x0000007F;
-			if (opcode == 0x0) break; // Stops when opcode is 0
+				pc += 4;
+				if (opcode == 0x0) break; // Stops when opcode is 0
 				instDecExec(instWord);
 			}
 			else
 			{
 				instWord = (unsigned char)memory[pc] |
-				(((unsigned char)memory[pc + 1]) << 8);
+					(((unsigned char)memory[pc + 1]) << 8);
 				opcode = instWord & 0x0000003;
-				if (opcode == 0x0) break; // Stops when opcode is 0
+				pc += 2;
+				if (instWord == 0x00000) break; // Stops when opcode is 0
 				compressedInst(instWord);
 			}
-			pc += 4;
+
 		}
 	}
 	else emitError("Cannot access input file\n");
