@@ -3,8 +3,7 @@ Assembly project
 
 ##Implementation
 
-  Based off of the skeleton code provided to us by our professor. 
-  We decided to divide the instruction types into separate functions, and each function outputs the specific instruction according to the BIN file. There is a function, named instDecExec, which checks the type of instruction by checking the opcode, and accordingly, calls the function of the corresponding instruction type.
+ We started by the skeleton code provided to us by our professor.Then, we decided to divide the instruction types into separate functions, and each function outputs the specific instruction according to the BIN file. There is a function, named instDecExec, which checks the type of instruction by checking the opcode, and accordingly, calls the function of the corresponding instruction type. Also, there is a function for the compressed instructions
 
 ##Limitations
 
