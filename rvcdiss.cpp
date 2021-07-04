@@ -32,7 +32,8 @@ void compressedInst(unsigned int instWord)
 	opcode = instWord & 0x3;
 	funct3 = (instWord >> 12) & 0x7;
 	printPrefix(instPC, instWord);
-
+	//cout << opcode << endl;
+	//cout << "jello" << endl;
 	if (opcode == 0)
 	{
 		imm1 = (instWord >> 5) & 0x1;
@@ -514,7 +515,8 @@ int main(int argc, char* argv[]) {
 	unsigned int opcode;
 	ifstream inFile;
 	ofstream outFile;
-
+	int count=0;
+	
 	if (argc < 2) emitError("use: rvcdiss <t1.bin>\n");
 
 	inFile.open(argv[1], ios::in | ios::binary | ios::ate);
@@ -525,31 +527,39 @@ int main(int argc, char* argv[]) {
 
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
-
-			for (int i = 0 ; i < 6 ; i++)
-			{
-				cout << memory[i] << endl;
-			}
+		unsigned char checker = ((unsigned char)memory[pc]) & 0x3;
+			// for (int i = 0 ; i < 6 ; i++)
+			// {
+			// 	cout << memory[i] << endl;
+			// }
 		while (true) {
-			if (((unsigned char)memory[pc] & 0x3) == 3)
+			if (checker == 3)
 			{
+				checker = ((unsigned char)memory[pc]) & 0x3;
 				instWord = (unsigned char)memory[pc] |
 				(((unsigned char)memory[pc + 1]) << 8) |
 				(((unsigned char)memory[pc + 2]) << 16) |
 				(((unsigned char)memory[pc + 3]) << 24);
 				opcode = instWord & 0x0000007F;
-			if (opcode == 0x0) break; // Stops when opcode is 0
-				instDecExec(instWord);
-			}
-			else
-			{
-				instWord = (unsigned char)memory[pc] |
-				(((unsigned char)memory[pc + 1]) << 8);
-				opcode = instWord & 0x0000003;
 				if (opcode == 0x0) break; // Stops when opcode is 0
-				compressedInst(instWord);
+				instDecExec(instWord);
+				
 			}
+			// else
+			// {
+			// 	//cout << "Test 123" << endl;
+			// 	instWord = (unsigned char)memory[pc] |
+			// 	(((unsigned char)memory[pc + 1]) << 8);
+			// 	opcode = instWord & 0x0000003;
+			// 	//if (opcode == 0x0) break; // Stops when opcode is 0
+			// 	compressedInst(instWord);
+			// 	pc+=2;
+			// }
+			// count++;
+			// if (count==5)
+			// 	exit(1);
 			pc += 4;
+			
 		}
 	}
 	else emitError("Cannot access input file\n");
