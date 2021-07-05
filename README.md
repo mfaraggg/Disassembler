@@ -11,6 +11,7 @@ We started with the skeleton code provided to us by our professor. Then, we deci
 
 ##Known issues
 
+  No known issues.
 
 ##Contributions of each team member
 

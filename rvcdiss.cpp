@@ -28,8 +28,7 @@ void compressedInst(unsigned int instWord)
 {
 	unsigned int rd, rs1, rs2, funct3, opcode;
 	unsigned int imm, imm1, imm2;
-	unsigned int instPC = pc - 2; //
-	//imm = ((instWord >> 20) & 0x7FF) | (((instWord >> 31) ? 0xFFFFF800 : 0x0));
+	unsigned int instPC = pc - 2;
 	opcode = instWord & 0x3;
 	funct3 = (instWord >> 13) & 0x7;
 	printPrefix(instPC, instWord);
@@ -41,6 +40,7 @@ void compressedInst(unsigned int instWord)
 		imm = (imm1 << 3) | (imm2);
 		imm = (imm << 1) | ((instWord >> 6) & 0x1);
 		imm = ((imm) & 0xF) | (((imm >> 4) ? 0xFFE0 : 0x0));
+
 		rd = (instWord >> 2) & 0x7;
 		rs1 = (instWord >> 7) & 0x7;
 		switch (funct3)
@@ -51,7 +51,6 @@ void compressedInst(unsigned int instWord)
 
 		case 6:
 			cout << "\tC.SW\t" << ABI[rd+8] << ", " << hex << "0x" << (int)imm << " (" << ABI[rs1+8] << ")" << "\n";
-			//rd is rs2
 			break;
 		default:
 			cout << "\tUnknown Compressed Instruction \n";
@@ -61,17 +60,20 @@ void compressedInst(unsigned int instWord)
 	{
 		switch (funct3)
 		{
-		case 0: // C.ADDI
+		case 0:
 			imm1 = ((instWord >> 2) & 0x1F);
 			imm2 = ((instWord >> 12) & 0x1);
 			imm = (imm2 << 5) | imm1;
 			imm = ((imm) & 0x1F) | (((imm >> 5) ? 0xFFC0 : 0x0));
-			if (imm == 0) {
+
+			if (imm == 0) 
+			{
 				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
 			}
 			rs1 = (instWord >> 7) & 0x1F;
-			if (rs1 == 0) {
+			if (rs1 == 0) 
+			{
 				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
 			}
@@ -97,17 +99,19 @@ void compressedInst(unsigned int instWord)
 			imm2 = (instWord >> 12) & 0x1;
 			imm = (imm2 << 5) | imm1;
 			imm = ((imm) & 0x1F) | (((imm >> 5) ? 0xFFC0 : 0x0));
+
 			if (imm == 0)
 				break;
+
 			rd = (instWord >> 7) & 0x1F;
+
 			if ((rd == 0) || (rd == 2))
 				break;
 			cout << "\tC.LUI\t" << ABI[rd] << ", " << hex << "0x" << imm << "\n";
 			break;
 
-		case 4: //ANDI
+		case 4:
 			rs1 = (instWord >> 7) & 0x7;
-			//cout << "''''''" << bitset<16>(instWord)<< "............."<<endl;
 			int temp = (instWord >> 10) & 0x3;
 			imm1 = ((instWord >> 2) & 0x1F);
 			imm2 = ((instWord >> 12) & 0x1);
@@ -120,7 +124,7 @@ void compressedInst(unsigned int instWord)
 			}
 			if (imm == 0)
 				break;
-			//rs1 = (instWord >> 7) & 0x1F;
+			
 			if (temp == 0)
 			{
 				cout << "\tC.SRLI\t" << ABI[rs1+8] << ", " << hex << "0x" << (int)imm << "\n";
@@ -165,9 +169,13 @@ void compressedInst(unsigned int instWord)
 			imm2 = ((instWord >> 12) & 0x1);
 			imm = (imm2 << 5) | imm1;
 			if (imm == 0)
+			{
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 			rs1 = (instWord >> 7) & 0x1F;
-			if (rs1 == 0) {
+			if (rs1 == 0) 
+			{
 				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
 			}
@@ -202,7 +210,7 @@ void R_Type(unsigned int instWord) //function for all R-Type instructions
 {
 	unsigned int rd, rs1, rs2, funct3, funct7 = 0, opcode;
 
-	unsigned int instPC = pc - 4; //
+	unsigned int instPC = pc - 4; 
 
 	opcode = instWord & 0x0000007F; //inserts first 7 bits in opcode
 	rd = (instWord >> 7) & 0x0000001F; //next 5 bits
@@ -346,9 +354,7 @@ void I_Type(unsigned int instWord) //I Type instruction set
 	else {
 		cout << "\tUnknown Instruction \n";
 	}
-
 }
-
 
 void S_Type(unsigned int instWord) //function for S Type instruction set
 {
@@ -356,12 +362,12 @@ void S_Type(unsigned int instWord) //function for S Type instruction set
 
 	unsigned int instPC = pc - 4;
 
-	//opcode = instWord & 0x0000007F;
+	
 	imm1 = (instWord >> 7) & 0x0000001F; //stores least siginigcant part of the imm
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
-	//imm2 = (instWord >> 25) & 0x0000007F;
+	
 	imm2 = (instWord >> 25) & 0x0000003F; //stores most signifcant half
 	imm = imm2;
 	imm = (imm2 << 5) | imm1; //concatenates the 2 values
@@ -396,7 +402,7 @@ void U_Type(unsigned int instWord) //instruction set for U type
 	opcode = instWord & 0x0000007F;
 	rd = (instWord >> 7) & 0x0000001F;
 	imm = (instWord >> 12) & 0x7FFFF;
-	//imm = imm << 12;
+	
 	imm = (imm) | (((instWord >> 31) ? 0xFFF80000 : 0x0));
 
 	printPrefix(instPC, instWord);
@@ -416,7 +422,6 @@ void B_Type(unsigned int instWord) //all B type functions
 
 	unsigned int instPC = pc - 4;
 
-	//opcode = instWord & 0x0000007F;
 	funct3 = (instWord >> 12) & 0x00000007;
 	rs1 = (instWord >> 15) & 0x0000001F;
 	rs2 = (instWord >> 20) & 0x0000001F;
@@ -543,10 +548,6 @@ int main(int argc, char* argv[]) {
 		inFile.seekg(0, inFile.beg);
 		if (!inFile.read((char*)memory, fsize)) emitError("Cannot read from input file\n");
 
-		// for (int i = 0 ; i < 6 ; i++)
-		// {
-		// 	cout << memory[i] << endl;
-		// }
 		while (true) {
 			if (((unsigned char)memory[pc] & 0x3) == 3)
 			{
@@ -565,7 +566,7 @@ int main(int argc, char* argv[]) {
 					(((unsigned char)memory[pc + 1]) << 8);
 				opcode = instWord & 0x0000003;
 				pc += 2;
-				if (instWord == 0x00000) break; // Stops when opcode is 0
+				if (instWord == 0x00000) break; // Stops when instruction is 0
 				compressedInst(instWord);
 			}
 
