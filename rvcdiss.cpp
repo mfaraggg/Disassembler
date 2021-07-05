@@ -101,12 +101,18 @@ void compressedInst(unsigned int instWord)
 			imm = ((imm) & 0x1F) | (((imm >> 5) ? 0xFFC0 : 0x0));
 
 			if (imm == 0)
+			{
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 
 			rd = (instWord >> 7) & 0x1F;
 
 			if ((rd == 0) || (rd == 2))
+			{
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 			cout << "\tC.LUI\t" << ABI[rd] << ", " << hex << "0x" << imm << "\n";
 			break;
 
@@ -123,7 +129,10 @@ void compressedInst(unsigned int instWord)
 				break;
 			}
 			if (imm == 0)
+			{
+				cout << "\tUnknown Compressed Instruction" << endl;
 				break;
+			}
 			
 			if (temp == 0)
 			{
@@ -204,6 +213,7 @@ void compressedInst(unsigned int instWord)
 			break;
 		}
 	}
+	cout << "\tUnknown Compressed Instruction \n";
 
 }
 void R_Type(unsigned int instWord) //function for all R-Type instructions
@@ -248,6 +258,7 @@ void R_Type(unsigned int instWord) //function for all R-Type instructions
 	case 5:
 		if (funct7 == 0) //conflicting funct3 codes need an if to compare funct7
 			cout << "\tSRL\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
+			
 		else
 			cout << "\tSRA\t" << ABI[rd] << ", " << ABI[rs1] << ", " << ABI[rs2] << "\n";
 		break;
