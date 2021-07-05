@@ -412,7 +412,7 @@ void U_Type(unsigned int instWord) //instruction set for U type
 
 void B_Type(unsigned int instWord) //all B type functions
 {
-	unsigned int rs1, rs2, funct3, imm, temp;
+	unsigned int rs1, rs2, funct3, imm, imm2, temp, temp2, temp3, temp4;
 
 	unsigned int instPC = pc - 4;
 
@@ -422,15 +422,19 @@ void B_Type(unsigned int instWord) //all B type functions
 	rs2 = (instWord >> 20) & 0x0000001F;
 
 	// Adding immediate bytes in order
-	imm = (instWord >> 8) & 0x000000F;
-	temp = (instWord >> 25) & 0x0000001F;
-	imm = imm + temp;
-	temp = (instWord >> 7) & 0x000001;
-	imm = imm + temp;
-	temp = (instWord >> 30) & 0x00001;
-	imm = imm + temp;
+	
+	temp = (instWord >> 7) & 0x000001; // imm[11]
+	temp2 = (instWord >> 8) & 0x00000F; // imm[4:1]
 
-	imm = imm << 1;
+	temp3 = (instWord >> 25) & 0x00001F; // imm[10:5]
+	temp4 = (instWord >> 31) & 0x000001; // imm[12]
+
+	imm = (temp4 << 1) | temp; 
+	imm2 = (temp3 << 4) | temp2;
+
+	imm = (imm << 10) | imm2;
+
+	imm = (imm << 1);
 
 	printPrefix(instPC, instWord);
 
@@ -476,18 +480,14 @@ void J_Type(unsigned int instWord) //J Type instruction set
 	
 	imm = (instWord >> 12) & 0x000000FF;
 	temp = (instWord >> 20) & 0x000001;
-	// temp = temp << 8;
 	temp = (imm << 1) | temp;
 
-	// imm = imm + temp;
 	imm = (instWord >> 21) & 0x00003FF;
 	temp = (temp << 10) | imm;
 	imm2 = (instWord << 31) & 0x00001;
 	temp = (temp << 1) | imm2;
 
-	// imm = imm + temp;
 	imm = temp;
-	// imm = imm << 1;
 	printPrefix(instPC, instWord);
 
 	cout << "\tJAL\t" << ABI[rd] << ", " << "0x" << hex << imm << "\n";
